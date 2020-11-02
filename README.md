@@ -50,6 +50,10 @@ folders.
 number of workers - depends on computer. 
 (more documention in torch https://pytorch.org/docs/stable/data.html)
 
+## Trained model
+We trained a model using libri-speech 100 hours speech data. 
+you can find the model in : https://github.com/almog1/SpeechMeasureServer/tree/main/neural_net/trained/multiclass_model.pth
+
 ## Authors
 
 **Almog Gueta** ,  **Jenny Smolensky** 
