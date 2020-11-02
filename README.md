@@ -13,10 +13,11 @@ vowels in an audio file.
 * numpy
 * soundfile
 * librosa
+
 * Download the code:
-```
-git clone https://github.com/Jenny-Smolenksy/ClassificationSpeechNet.git
-```
+ ```
+    git clone https://github.com/Jenny-Smolenksy/ClassificationSpeechNet.git
+ ```
 
 ## Data
 Train/Validation/Test files should be in next the format:
