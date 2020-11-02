@@ -22,17 +22,37 @@ def build_model_name(args):
 class ClassificationNet:
 
     def __init__(self, data_folder, num_classes, num_of_workers):
+        """
+        Construction to initialize net
+        Args:
+            data_folder (): folder path, contains folder train and valid
+            num_classes (): num of classes for multiclass classification
+            num_of_workers (): for pytorch
+        """
         print('initializing classification net')
+        # set args
         self.args = self.init_args(data_folder, num_classes)
+        # set data
         self.train_loader, self.valid_loader = self.init_data_loaders(num_of_workers)
+        # create model
         self.model = self.create_model()
+        # create optimizer
         self.optimizer = self.create_optimizer(self.model)
+        # load previous model, if exists
         prev_model = self.load_previous_model()
         if prev_model:
             self.model = prev_model
 
-    #create arguments form model
     def init_args(self, data_path, num_classes):
+        """
+        create arguments for net
+        Args:
+            data_path (): folder path for data
+            num_classes (): multiclass classification
+
+        Returns:
+            args
+        """
 
         parser = argparse.ArgumentParser(
             description='ConvNets for Speech Commands Recognition')
@@ -87,8 +107,15 @@ class ClassificationNet:
             torch.manual_seed(args.seed)
         return args
 
-    #create torch data loaders for train and validation data
     def init_data_loaders(self, num_of_workers):
+        """
+        create torch data loaders for train and validation data
+        Args:
+            num_of_workers ():
+
+        Returns:
+            train , validation data loaders
+        """
 
         train_dataset = ClassificationLoader(self.args.train_path,
                                              window_size=self.args.window_size,
@@ -111,15 +138,19 @@ class ClassificationNet:
                                              normalize=self.args.normalize,
                                              max_len=self.args.max_len)
 
-        valid_loader =\
+        valid_loader = \
             torch.utils.data.DataLoader(valid_dataset, batch_size=self.args.batch_size,
                                         shuffle=None, num_workers=num_of_workers,
                                         pin_memory=self.args.cuda, sampler=None)
 
         return train_loader, valid_loader,
 
-    #create the model
     def create_model(self):
+        """
+        create the model
+        Returns:
+            vgg model
+        """
         # build model
         if self.args.arc.startswith("VGG"):
             model = VGG(self.args.arc, self.args.class_num)
@@ -131,8 +162,15 @@ class ClassificationNet:
 
         return model
 
-    #create optimizer for the model
     def create_optimizer(self, model):
+        """
+        create optimizer for the model
+        Args:
+            model ():
+
+        Returns:
+            torch optimizer
+        """
         # define optimizer
         if self.args.optimizer.lower() == 'adam':
             optimizer = optim.Adam(model.parameters(), lr=self.args.lr)
@@ -144,8 +182,12 @@ class ClassificationNet:
                                   momentum=self.args.momentum)
         return optimizer
 
-    #check for model
     def load_previous_model(self):
+        """
+        check for model
+        Returns:
+            VGG previoud model if exists, none if no such model.
+        """
         model = None
         # build model
         if os.path.isfile(self.args.prev_classification_model):  # model exists
@@ -157,9 +199,17 @@ class ClassificationNet:
 
         return model
 
-    #load existing model parameters
     @staticmethod
     def load_model_params(save_dir, model):
+        """
+        load existing model parameters
+        Args:
+            save_dir (): path of the existing model
+            model (): type to search
+
+        Returns:
+            trained model, previous: validation loss, epoch number, classification count
+        """
         checkpoint = torch.load(save_dir, map_location=lambda storage, loc: storage)
 
         current_dict = model.state_dict()
@@ -173,8 +223,12 @@ class ClassificationNet:
 
         return model, checkpoint['acc'], checkpoint['epoch'], checkpoint['class_num']
 
-    #train the model
     def train(self):
+        """
+        train the model
+        Returns:
+
+        """
         best_valid_loss = np.inf
         iteration = 0
         epoch = 1
@@ -183,7 +237,7 @@ class ClassificationNet:
         while (epoch < self.args.epochs + 1) and (iteration < self.args.patience):
 
             ClassificationNet.train_classification(self.train_loader, self.model, self.optimizer,
-                  epoch, self.args.cuda, self.args.log_interval)
+                                                   epoch, self.args.cuda, self.args.log_interval)
 
             valid_loss, acc = \
                 ClassificationNet.test_classification(self.valid_loader, self.model, self.args.cuda)
@@ -210,8 +264,16 @@ class ClassificationNet:
                 torch.save(state, self.args.save_folder + '/' + build_model_name(self.args))
             epoch += 1
 
-    #test the model on test set
     def test(self, folder_path, num_of_workers=0):
+        """
+        test the model on given test set
+        Args:
+            folder_path (): for test set
+            num_of_workers (): for torch
+
+        Returns:
+
+        """
 
         test_dataset = ClassificationLoader(folder_path,
                                             window_size=self.args.window_size,
@@ -226,9 +288,19 @@ class ClassificationNet:
 
         ClassificationNet.test_classification(test_loader, self.model, self.args.cuda)
 
-    #classification model testet
     @staticmethod
     def test_classification(loader, model, cuda, verbose=True):
+        """
+        classification model tester
+        Args:
+            loader (): torch data loader
+            model (): trained model
+            cuda ():
+            verbose (): to print results
+
+        Returns:
+
+        """
         model.eval()
         test_loss = 0
         correct = 0
@@ -247,9 +319,22 @@ class ClassificationNet:
                     test_loss, correct, len(loader.dataset), 100. * correct / len(loader.dataset)))
         return test_loss, 100. * correct / len(loader.dataset)
 
-    #classification model trainer
     @staticmethod
     def train_classification(loader, model, optimizer, epoch, cuda, log_interval, verbose=True):
+        """
+        classification model trainer
+        Args:
+            loader (): torch data loader
+            model (): to train
+            optimizer (): for training process
+            epoch (): number of epochs to run
+            cuda (): True/False
+            log_interval (): time interval to log results
+            verbose (): to print progress
+
+        Returns:
+            average loss
+        """
         model.train()
         global_epoch_loss = 0
         for batch_idx, (data, target) in enumerate(loader):
@@ -272,10 +357,14 @@ class ClassificationNet:
 
 
 def main():
-    data_path = "data_folder_path" #main folder, in it: train folder, valid folder
+    # main folder, in it: train folder, valid folder
+    data_path = "data_folder_path"
+
     net = ClassificationNet(data_path, num_classes=6, num_of_workers=0)
     net.train()
-    net.test()
+
+    test_folder = "test_path"
+    net.test(test_folder)
 
 
 if __name__ == '__main__':
