@@ -16,7 +16,7 @@ vowels in an audio file.
 
 * Download the code:
  ```
-    git clone https://github.com/Jenny-Smolenksy/ClassificationSpeechNet.git
+    git clone https://github.com/Jenny-Smolensky/ClassificationSpeechNet.git
  ```
 
 ## Data
@@ -40,19 +40,18 @@ Each folder indicated a number of vowels should contain the audio files with
 In All three folders should have same amount of folders.
 ```
 Create data using  libri speech files parser project (also contains sample files in suatable format)
-```
-https://github.com/Jenny-Smolenksy/libri-speech-files-parser
-```
+[here](https://github.com/Jenny-Smolensky/libri-speech-files-parser)
+
 ## Parameters
 number of classes - The number of different folders you have in train, validation and test
 folders.
 
 number of workers - depends on computer. 
-(more documention in torch https://pytorch.org/docs/stable/data.html)
+more documention on [pytorch](https://pytorch.org/docs/stable/data.html)
 
 ## Trained model
 We trained a model using libri-speech 100 hours speech data. 
-you can find the model in : https://github.com/almog1/SpeechMeasureServer/tree/main/neural_net/trained/multiclass_model.pth
+you can find the trained model on : https://github.com/almog1/SpeechMeasureServer/tree/main/neural_net/trained/multiclass_model.pth
 
 ## Authors
 
