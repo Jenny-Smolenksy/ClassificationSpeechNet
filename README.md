@@ -40,7 +40,7 @@ Each folder indicated a number of vowels should contain the audio files with
 In All three folders should have same amount of folders.
 ```
 Create data using  libri speech files parser project (also contains sample files in suatable format)
-[here](https://github.com/Jenny-Smolensky/libri-speech-files-parser)
+[here](https://github.com/Jenny-Smolensky/LibriSpeechFilesParser)
 
 ## Parameters
 number of classes - The number of different folders you have in train, validation and test
